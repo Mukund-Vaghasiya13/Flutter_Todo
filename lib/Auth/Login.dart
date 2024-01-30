@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo/Auth/CommonController.dart';
+import 'package:todo/Auth/Register.dart';
 
 class LoginView extends StatelessWidget {
   TextEditingController _controllerUsername = TextEditingController();
@@ -7,6 +8,8 @@ class LoginView extends StatelessWidget {
   Widget spacer = SizedBox(
     height: 20,
   );
+
+  GlobalKey<FormState> Key = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +24,7 @@ class LoginView extends StatelessWidget {
       ),
       body: Center(
         child: Form(
+          key: Key,
           child: LayoutBuilder(builder: (context, constraints) {
             return SizedBox(
               width: constraints.maxWidth > 800
@@ -48,7 +52,9 @@ class LoginView extends StatelessWidget {
                       title: "Login",
                       constraints: constraints,
                       Onclick: () {
-                        print("working");
+                       if(Key.currentState!.validate()){
+                        print("Working");
+                       }
                       },
                     ),
                     spacer,
@@ -61,7 +67,7 @@ class LoginView extends StatelessWidget {
                       title: "Sinup",
                       constraints: constraints,
                       Onclick: () {
-                        print("working");
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SinupView()));
                       },
                     ),
                   ],
@@ -69,41 +75,6 @@ class LoginView extends StatelessWidget {
               ),
             );
           }),
-        ),
-      ),
-    );
-  }
-}
-
-class MyButton extends StatelessWidget {
-  BoxConstraints constraints;
-  Function() Onclick;
-  String? title;
-  MyButton({required this.Onclick, required this.constraints,this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black,
-      borderRadius: BorderRadius.circular(5),
-      child: InkWell(
-        // splashColor: Colors.white,
-        onTap: Onclick,
-        child: Container(
-          child: Center(
-            child: Text(
-              title!,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ),
-          height: 55,
-          width: constraints.maxWidth > 800
-              ? constraints.maxWidth / 2.2
-              : constraints.maxWidth / 1.2,
         ),
       ),
     );
