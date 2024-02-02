@@ -1,15 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo/Auth/CommonController.dart';
 import 'package:todo/Auth/Register.dart';
+import 'package:todo/Modles/ApiService.dart';
+import 'package:todo/Modles/AuthModle.dart';
+import 'package:todo/Screen/HomeScreen.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
+   SharedPreferences? pref;
   TextEditingController _controllerUsername = TextEditingController();
+
   TextEditingController _controllerPassword = TextEditingController();
+
   Widget spacer = SizedBox(
     height: 20,
   );
 
   GlobalKey<FormState> Key = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // TODO: error
+    // IsUserLoginorNot();
+  }
+
+
+  void IsUserLoginorNot()async{
+   pref = await SharedPreferences.getInstance();
+   if(pref!.getString("token") != ""){
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));
+   }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +79,18 @@ class LoginView extends StatelessWidget {
                     MyButton(
                       title: "Login",
                       constraints: constraints,
-                      Onclick: () {
+                      Onclick: ()async {
                        if(Key.currentState!.validate()){
-                        print("Working");
+                         var response = await ApiHandler.Post("https://todo-xiii.onrender.com/api/todo/v1/login", {
+                          "username": _controllerUsername.value.text,
+                          "password": _controllerPassword.value.text
+                        });
+
+                        var data = Auth.fromjson(response);
+                        if(data.success ?? false){
+                         pref!.setString("token", data.data!);
+                        }
+
                        }
                       },
                     ),
