@@ -12,7 +12,7 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-   SharedPreferences? pref;
+  SharedPreferences? pref;
   TextEditingController _controllerUsername = TextEditingController();
 
   TextEditingController _controllerPassword = TextEditingController();
@@ -27,15 +27,15 @@ class _LoginViewState extends State<LoginView> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // TODO: error
-    // IsUserLoginorNot();
+    IsUserLoginorNot();
   }
 
 
   void IsUserLoginorNot()async{
    pref = await SharedPreferences.getInstance();
-   if(pref!.getString("token") != ""){
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));
+   var a =  pref!.getString("token");
+   if(a != null){
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Home(token: a,)));
    }
   }
 
@@ -84,11 +84,12 @@ class _LoginViewState extends State<LoginView> {
                          var response = await ApiHandler.Post("https://todo-xiii.onrender.com/api/todo/v1/login", {
                           "username": _controllerUsername.value.text,
                           "password": _controllerPassword.value.text
-                        });
+                        },null);
 
                         var data = Auth.fromjson(response);
                         if(data.success ?? false){
                          pref!.setString("token", data.data!);
+                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Home(token: data.data!,)));
                         }
 
                        }
