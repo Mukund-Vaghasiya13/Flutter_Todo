@@ -11,4 +11,13 @@ class ApiHandler{
     var jsondata = jsonDecode(response.body);
     return jsondata;
   }
+
+  static Future<dynamic> GetData(String url,String? authToken)async{
+      var uri = Uri.parse(url);
+      var response = await http.get(uri,headers: {
+       "Authorization":"Bearer ${authToken ?? ""}"
+      });
+      var jsondata = jsonDecode(response.body);
+      return jsondata;
+  }
 }
