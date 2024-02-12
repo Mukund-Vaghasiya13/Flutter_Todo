@@ -72,8 +72,6 @@ class _HomeState extends State<Home> {
                 ],
               ));
          }, icon: Icon(Icons.add,size: 40,))
-         
-
         ],
       ),
       body: Padding(
