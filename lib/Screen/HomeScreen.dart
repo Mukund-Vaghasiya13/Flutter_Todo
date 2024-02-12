@@ -17,7 +17,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List? dataLst;
   String? todo;
-  var _token = TextEditingController();
   @override
   void initState() {
     // TODO: implement initState
@@ -28,8 +27,11 @@ class _HomeState extends State<Home> {
   void getTodo()async{
     var response = await ApiHandler.GetData("https://todo-xiii.onrender.com/api/todo/v1/Todos/todo/gettodo", widget.token);
     var data = List.from(response["data"]).map((e)=>Todo.fromjson(e)).toList();
-    dataLst = data;
+   setState(() {
+      dataLst = data;
+   });
     print(dataLst ?? "nulllllll lll");
+
   }
 
   @override
@@ -52,6 +54,7 @@ class _HomeState extends State<Home> {
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginView()));
          }, icon: Icon(Icons.exit_to_app,size: 40,)),
           IconButton(onPressed: ()async{
+            var _token = TextEditingController();
             showDialog(context: context, builder:(context)=>AlertDialog(
                 title: Text("Add todo"),
                 actions: [
@@ -73,10 +76,48 @@ class _HomeState extends State<Home> {
 
         ],
       ),
-      body: Center(
-        child: Column(children: [
-
-        ]),
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: ListView.builder(itemBuilder: (context,i){
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: [
+                  Text(dataLst![i].todo ?? "",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+                  Expanded(child: SizedBox()),
+                  IconButton(onPressed: ()async{
+                    var response = await ApiHandler.Post("https://todo-xiii.onrender.com/api/todo/v1/Todos/todo/delete", {"TodoID":dataLst![i].id}, widget.token );
+                    if(response["success"]){
+                      getTodo();
+                    }
+                  }, icon: Icon(CupertinoIcons.delete)),
+                  IconButton(onPressed: (){
+                    var edit = TextEditingController();
+                    showDialog(context: context, builder: (context){
+                     return AlertDialog(
+                        title: Text(dataLst![i].todo,),
+                        actions: [
+                          FormTextField(value: edit,error: "Enter \"Edit\" Value",lable: "Edit",title: "Enter Value",),
+                          ElevatedButton(onPressed: ()async{
+                            var response = await ApiHandler.Post("https://todo-xiii.onrender.com/api/todo/v1/Todos/todo/update", {
+                              "todo":edit.text,
+                              "TodoID":dataLst![i].id
+                            }, widget.token);
+                            if(response["success"]){
+                              getTodo();
+                              Navigator.pop(context);
+                            }
+                          }, child: Text("Edit"))
+                        ],
+                      );
+                    });
+                  }, icon: Icon(CupertinoIcons.pencil))
+                ],
+              ),
+            ),
+          );
+        },itemCount: dataLst?.length ?? 0),
       ),
     );
   }
